@@ -14,32 +14,63 @@ end
       tg.sendMessage(matches[2], 0, 0,  matches[3], 0)
    end
 
-   if matches[1] == 'setbotusername' and is_sudo(msg) then
-      tg.changeUsername(string.sub(matches[2], 11))
-      tg.sendMessage(msg.chat_id_, 0, 1,'<b>Username Changed To </b>@'..string.sub(matches[2], 11), 1, 'html')
-   end
-
-   if matches[1] == 'setbotname' and is_sudo(msg) then
-      tg.changeName(string.sub(matches[2], 13), nil, 1)
-      tg.sendMessage(msg.chat_id_, 0, 1,'<b>Bot Name Changed To </b><code>'..string.sub(matches[2], 13)..'</code>', 1, 'html')
-   end
-
-   if matches[1] == 'invite' and is_sudo(msg) then
-      tg.addChatMember(msg.chat_id_, string.sub(matches[2], 9), 20)
-   end
+   if matches[1] == 'import' and is_sudo(msg) then
+      tg.importChatInviteLink('https://telegram.me/joinchat/'..matches[2])
+   elseif matches[1] == 'setbotname' and is_sudo(msg) then
+      if matches[3] then
+         text = "نام ربات به "..matches[2]..matches[3].." تغییر یافت."
+         tg.sendMessage(msg.chat_id_, 0, 1, text, 1, 'html')
+         tg.changeName(matches[2], matches[3])
+      else
+         text = "نام ربات به "..matches[2].." تغییر یافت."
+         tg.sendMessage(msg.chat_id_, 0, 1, text, 1, 'html')
+         tg.changeName(matches[2], '')
+    end
+    
+    if matches[1] == 'setbotusername' and is_sudo(msg) then
+       tg.changeUsername(matches[2])
+       tg.sendMessage(msg.chat_id_, 0, 1, "یوزرنیم روبات به "..matches[2].."تغییر یافت!", 1, 'html')
+    end
+      
+    if matches[1] == 'rembotusername' and is_sudo(msg) then
+       tg.changeUsername('')
+    end
+      
+    if matches[1] == 'setbotphoto' and is_sudo(msg) then
+       tg.sendMessage(msg.chat_id_, 0, 1, 'لطفا تصویر را ارسال کنید.', 1, 'html')
+       redis:set('botphoto','yes')
+    elseif matches[1] == 'photo' and is_sudo(msg) and redis:get('botphoto') then
+       local file = 'bot/photos/bot.jpg'
+       print('File downloaded to:', msg.content_.photo_.sizes_[0].photo_.path_)
+       os.rename(msg.content_.photo_.sizes_[0].photo_.path_, file)
+       print('File moved to:', file)
+       tg.setProfilePhoto(msg.content_.photo_.sizes_[0].photo_.path_)
+       redis:del('botphoto',true)
+      end
+    end
+  end
 end
 return {
   patterns = {
     "^[#!/](markread) (.*)$",
     "^[#!/](bc) (%d+) (.*)$",
     "^[#!/](setbotusername) (.*)$",
+    "^[#!/](rembotusername)$",
     "^[#!/](setbotname) (.*)$",
+    "^[#!/](setbotphoto)$",
     "^[#!/](invite) (.*)$",
+    "^[#!/](import) https://telegram.me/joinchat/(.*)$",
+    "^[#!/](setbotname) (.*) (.*)$",
     "^!!!edit:[#!/](markread) (.*)$",
     "^!!!edit:[#!/](bc) (%d+) (.*)$",
     "^!!!edit:[#!/](setbotusername) (.*)$",
+    "^!!!edit:[#!/](rembotusername)$",
     "^!!!edit:[#!/](setbotname) (.*)$",
+    "^!!!edit:[#!/](setbotname) (.*) (.*)$",
+    "^!!!edit:[#!/](setbotphoto)$",
     "^!!!edit:[#!/](invite) (.*)$",
+    "^!!!edit:[#!/](import) https://telegram.me/joinchat/(.*)$",
+    "^!!!(photo):$",
   },
   run = run,
 }
