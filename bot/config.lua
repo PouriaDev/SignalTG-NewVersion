@@ -5,7 +5,8 @@ do local _ = {
     "lock",
     "msg_checks",
     "Admin",
-    "GroupManager"
+    "GroupManager",
+    "Moderator"
   },
   group  = {
     data = "bot/group.json"
