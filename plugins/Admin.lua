@@ -35,7 +35,14 @@ end
     if matches[1] == 'rembotusername' and is_sudo(msg) then
        tg.changeUsername('')
     end
-      
+
+	 if matches[1] == 'broadcast' and is_sudo(msg) then
+       local group = load_data(_config.group.data)
+       local text = matches[2]
+          for k,v in pairs(group[tostring('groups')]) do
+             tg.sendMessage(v, 0, 0,  text, 0) 
+    end
+         
     if matches[1] == 'setbotphoto' and is_sudo(msg) then
        tg.sendMessage(msg.chat_id_, 0, 1, 'لطفا تصویر را ارسال کنید.', 1, 'html')
        redis:set('botphoto','yes')
@@ -58,6 +65,7 @@ return {
     "^[#!/](rembotusername)$",
     "^[#!/](setbotname) (.*)$",
     "^[#!/](setbotphoto)$",
+    "^[#!/](broadcast) (.*)$",
     "^[#!/](invite) (.*)$",
     "^[#!/](import) https://telegram.me/joinchat/(.*)$",
     "^[#!/](setbotname) (.*) (.*)$",
@@ -69,6 +77,7 @@ return {
     "^!!!edit:[#!/](setbotname) (.*) (.*)$",
     "^!!!edit:[#!/](setbotphoto)$",
     "^!!!edit:[#!/](invite) (.*)$",
+    "^!!!edit:[#!/](broadcast) (.*)$",
     "^!!!edit:[#!/](import) https://telegram.me/joinchat/(.*)$",
     "^!!!(photo):$",
   },
